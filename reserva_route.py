@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from reserva_model import Reserva
-from database import db
+from model.reserva_model import Reserva
+from model.bancoSQLite import db
 import requests
 
 routes = Blueprint("routes", __name__)
