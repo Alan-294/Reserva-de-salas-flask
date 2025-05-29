@@ -1,8 +1,71 @@
 import sqlite3
 import sys
 import os
+import requests 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from config import banco_de_dados as bd
+
+
+def importar_professores_da_api():
+    url = "http://localhost:5000/api/professores"
+    
+    try:
+        resposta = requests.get(url)
+        resposta.raise_for_status()
+        professores = resposta.json()
+
+        conexao = sqlite3.connect(bd)
+        cursor = conexao.cursor()
+
+        for prof in professores:
+            cursor.execute(
+                "INSERT INTO professores (nome, disciplina) VALUES (?, ?)",
+                (prof["nome"], prof["disciplina"])
+            )
+        
+        conexao.commit()
+        conexao.close()
+        print("Professores importados com sucesso!")
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar dados da API: {e}")
+
+import requests
+import sqlite3
+from config import banco_de_dados as bd
+
+def importar_turmas_da_api():
+    url = "http://localhost:5000/api/turma"  # endpoint exato da API
+
+    try:
+        resposta = requests.get(url)
+        resposta.raise_for_status()  # Verifica se houve erro na resposta
+        turmas = resposta.json()
+
+        conexao = sqlite3.connect(bd)
+        conexao.execute("PRAGMA foreign_keys = ON")
+        cursor = conexao.cursor()
+
+        for turma in turmas:
+            cursor.execute("""
+                INSERT OR IGNORE INTO turmas (id, nome, turno, professor_id, ativo)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                turma["id"],
+                turma["nome"],
+                turma["turno"],
+                turma["professor_id"],
+                turma["ativo"]
+            ))
+
+        conexao.commit()
+        conexao.close()
+        print("Turmas importadas com sucesso!")
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao acessar API de turmas: {e}")
+
 
 def inicializar_banco():
     conexao = sqlite3.connect(bd)
@@ -12,20 +75,7 @@ def inicializar_banco():
    
     # Criação das tabelas
    
-    # cursor.execute('''
-    #                 CREATE TABLE IF NOT EXISTS SALAS (
-    #                 ID_SALA INTEGER PRIMARY KEY AUTOINCREMENT,
-    #                 AGENDADAS BOOLEAN NOT NULL DEFAULT 0,
-    #                 id_turma INTEGER,
-    #                 nome_turma TEXT,
-    #                 id_professor INTEGER,
-    #                 nome_professor TEXT, 
-    #                 id_aluno INTEGER,
-    #                 nome_aluno TEXT,
-    #                 id_atividade INTEGER,
-    #                 nome_atividade TEXT
-    #                )
-    #                ''') 
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS professores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,35 +107,6 @@ def inicializar_banco():
                    )
                    ''') 
     print("Tabelas criadas com sucesso!")
-
-    
-    # Verificar se a tabela professores já possui registros
-    cursor.execute("SELECT COUNT(*) FROM professores")
-    if cursor.fetchone()[0] == 0:
-        professores = [
-            ("João Silva", "Matemática"),
-            ("Maria Oliveira", "História"),
-            ("Carlos Souza", "Física"),
-            ("Ana Lima", "Química"),
-            ("Fernanda Costa", "Biologia")
-        ]
-        cursor.executemany("INSERT INTO professores (nome, disciplina) VALUES (?, ?)", professores)
-
-    # Buscar IDs reais dos professores
-    cursor.execute("SELECT id FROM professores ORDER BY id")
-    professores_ids = [row[0] for row in cursor.fetchall()]
-
-    # Inserir turmas (se não existirem)
-    cursor.execute("SELECT COUNT(*) FROM turmas")
-    if cursor.fetchone()[0] == 0:
-        turmas = [
-            ("Turma A", "Manhã", professores_ids[0], True),
-            ("Turma B", "Tarde", professores_ids[1], True),
-            ("Turma C", "Noite", professores_ids[2], True),
-            ("Turma D", "Manhã", professores_ids[3], True),
-            ("Turma E", "Tarde", professores_ids[4], True)
-        ]
-        cursor.executemany("INSERT INTO turmas (nome, turno, professor_id, ativo) VALUES (?, ?, ?, ?)", turmas)
 
 
 
