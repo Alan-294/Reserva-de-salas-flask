@@ -20,8 +20,8 @@ def importar_professores_da_api():
 
         for prof in professores:
             cursor.execute(
-                "INSERT INTO professores (nome, disciplina) VALUES (?, ?)",
-                (prof["nome"], prof["disciplina"])
+                "INSERT OR IGNORE INTO professores (id, nome, disciplina) VALUES (?, ?, ?)",
+                (prof["id"], prof["nome"], prof["disciplina"])
             )
         
         conexao.commit()
