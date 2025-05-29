@@ -6,7 +6,7 @@ from model.bancoSQLite import importar_professores_da_api
 from model.bancoSQLite import importar_turmas_da_api
 
 app = create_app()
-app.register_blueprint(reserva_bp, url_prefix='/reservas')
+app.register_blueprint(reserva_bp)
 
 inicializar_banco()
 importar_professores_da_api()

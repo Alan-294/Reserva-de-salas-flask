@@ -31,10 +31,6 @@ def importar_professores_da_api():
     except requests.exceptions.RequestException as e:
         print(f"Erro ao buscar dados da API: {e}")
 
-import requests
-import sqlite3
-from config import banco_de_dados as bd
-
 def importar_turmas_da_api():
     url = "http://localhost:5000/api/turma"  # endpoint exato da API
 
