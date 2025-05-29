@@ -44,7 +44,7 @@ def criar_reserva():
         return jsonify({"mensagem": "Reserva criada com sucesso"}), 201
     except Exception as e:
         print("Erro ao inserir reserva:", e)
-        return jsonify({"erro": "Erro ao criar reserva"}), 500
+        return jsonify({"erro": "Erro ao criar reserva"+ e}), 500
     finally:
         banco.close()
 
