@@ -8,7 +8,7 @@ from config import banco_de_dados as bd
 
 
 def importar_professores_da_api():
-    url = "http://localhost:5000/api/professores"
+    url = "https://new-api-flask2.onrender.com/api/professores"
     
     try:
         resposta = requests.get(url)
