@@ -4,7 +4,7 @@ import requests
 
 reserva_bp = Blueprint('reserva_bp', __name__)
 
-API_ESCOLAR_URL = "http://localhost:5000/api/turma"
+API_ESCOLAR_URL = "https://new-api-flask2.onrender.com/api/turma"
 
 def validar_turma(turma_id):
     try:
